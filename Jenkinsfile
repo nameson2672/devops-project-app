@@ -45,12 +45,6 @@ pipeline {
 				sh "docker build -t ${DOCKER_IMAGE}:${env.DOCKER_TAG} ."
 			}
 		}
-        stage('Login') {
-
-			steps {
-				sh 'docker login'
-			}
-		}
 
         stage('Push') {
 
