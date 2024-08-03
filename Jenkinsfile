@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'nameson/devops-project-app'
+        registryCredential = "dockerhub"
 
     }
 
@@ -48,11 +49,10 @@ pipeline {
             }
         }
 
-        stage('Push to Docker Hub') {
+        stage('Deploying Docker Image') {
             steps {
                 script {
-                    docker.withRegistry('', 'dockerhub') {
-                        // Push the Docker image to Docker Hub
+                    docker.withRegistry('', registryCredential) {
                         def image = docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}")
                         image.push()
                     }
