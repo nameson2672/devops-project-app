@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'nameson/devops-project-app'
+        DOCKERHUB_CREDENTIALS=credentials('dockerhub')
 
     }
 
@@ -38,36 +39,33 @@ pipeline {
                 }
             }
         }
+        stage('Build') {
 
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    // Build the Docker image with the new tag
-                    def image = docker.build("${DOCKER_IMAGE}")
-                }
-            }
-        }
+			steps {
+				sh "docker build -t ${DOCKER_IMAGE}:${env.DOCKER_TAG} ."
+			}
+		}
+        stage('Login') {
 
-        stage('Push to Docker Hub') {
-            steps {
-                script {
-                    docker.withDockerRegistry(credentialsId: 'dockerhub', url: 'https://index.docker.io/v1/') {
-                        // Push the Docker image to Docker Hub
-                        image = docker.image("${env.BUILD_NUMBER}")
-                        image.push()
-                    }
-                }
-            }
-        }
+			steps {
+				sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+			}
+		}
+
+        stage('Push') {
+
+			steps {
+				sh "docker push ${DOCKER_IMAGE}:${env.DOCKER_TAG}"
+			}
+		}
     }
 
     post {
         always {
             // Clean up the local Docker environment
-            script {
-                image = docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}")
-                image.remove()
-            }
+            steps {
+				sh "docker rmi ${DOCKER_IMAGE}:${env.DOCKER_TAG} || true"
+			}
         }
     }
 }
