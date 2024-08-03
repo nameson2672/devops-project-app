@@ -45,6 +45,12 @@ pipeline {
 				sh "docker build -t ${DOCKER_IMAGE}:${env.DOCKER_TAG} ."
 			}
 		}
+        stage('Login') {
+
+			steps {
+				sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+			}
+		}
 
         stage('Push') {
 
