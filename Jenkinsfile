@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'nameson/devops-project-app'
-        registryCredential = "dockerhub"
+        DOCKER_CREDENTIALS_ID = 'dockerhub'
 
     }
 
@@ -39,25 +39,53 @@ pipeline {
                 }
             }
         }
-
+        stages {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build the Docker image with the new tag
-                    def image = docker.build("${DOCKER_IMAGE}")
+                    // Construct the Docker image tag
+                    def imageTag = "${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    
+                    // Build the Docker image
+                    sh """
+                    docker build -t ${imageTag} .
+                    """
                 }
             }
         }
 
-        stage('Deploying Docker Image') {
+        stage('Login to Docker Hub') {
             steps {
                 script {
-                    docker.withRegistry('', registryCredential) {
-                        def image = docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}")
-                        image.push()
-                    }
+                    // Login to Docker Hub
+                    sh """
+                    echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin
+                    """
                 }
             }
+        }
+        
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    // Push the Docker image to Docker Hub
+                    sh """
+                    docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:${DOCKER_TAG}
+                    docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+                    """
+                }
+            }
+        }
+
+        post {
+        always {
+            script {
+                // Delete the Docker image
+                sh """
+                docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true
+                """
+            }
+        }
         }
     }
 
@@ -70,4 +98,5 @@ pipeline {
             }
         }
     }
+}
 }
