@@ -53,7 +53,7 @@ pipeline {
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
                         // Push the Docker image to Docker Hub
-                        def image = docker.image("${env.BUILD_NUMBER}")
+                        def image = docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}")
                         image.push()
                     }
                 }
