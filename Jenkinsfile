@@ -42,6 +42,9 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
+                    echo whoami
+                    echo "groups:"
+                    echo groups
                     // Build the Docker image with the new tag
                     def image = docker.build("${DOCKER_IMAGE}")
                 }
