@@ -43,7 +43,7 @@ pipeline {
             steps {
                 script {
                     // Build the Docker image with the new tag
-                    def image = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
+                    def image = docker.build("${DOCKER_IMAGE}")
                 }
             }
         }
@@ -51,9 +51,9 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    docker.withRegistry('') {
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
                         // Push the Docker image to Docker Hub
-                        def image = docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}")
+                        def image = docker.image("${env.BUILD_NUMBER}")
                         image.push()
                     }
                 }
