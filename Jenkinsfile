@@ -48,8 +48,14 @@ pipeline {
         stage('Login') {
 
 			steps {
-				sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR'
+				  script{
+                    // Use Jenkins Credentials for Docker Hub Login
+                    withCredentials([usernamePassword(credentialsId:dockerHubCredentials, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]){
+                        sh "docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD"
+
 			}
+            }
+            }
 		}
 
         stage('Push') {
@@ -68,4 +74,4 @@ pipeline {
 			}
         }
     }
-}
+    }
