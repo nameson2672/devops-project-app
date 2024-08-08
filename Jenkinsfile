@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'nameson/devops-project-app'
         DOCKERHUB_CREDENTIALS=credentials('dockerhub')
-
+        DOCKER_CREDENTIALS_ID = 'dockerhub' // Use the ID from the credentials setup
     }
 
     stages {
@@ -49,20 +49,14 @@ pipeline {
 
 			steps {
 				  script{
-                    // Use Jenkins Credentials for Docker Hub Login
-                    withCredentials([usernamePassword(credentialsId:dockerHubCredentials, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]){
-                        sh "docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD"
+                   docker.withRegistry('', DOCKER_CREDENTIALS_ID) {
+                        // Push the image to Docker Hub
+                        docker.image("${DOCKER_IMAGE}:${env.DOCKER_TAG}").push()
+                    }
 
 			}
             }
             }
-		}
-
-        stage('Push') {
-
-			steps {
-				sh "docker push ${DOCKER_IMAGE}:${env.DOCKER_TAG}"
-			}
 		}
     }
 
