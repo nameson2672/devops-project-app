@@ -5,6 +5,8 @@ pipeline {
         DOCKER_IMAGE = 'nameson/devops-project-app'
         DOCKERHUB_CREDENTIALS=credentials('dockerhub')
         DOCKER_CREDENTIALS_ID = 'dockerhub' // Use the ID from the credentials setup
+         SLACK_CREDENTIALS_ID = 'slack_app_secret' // Use the ID from the credentials setup
+        SLACK_CHANNEL = '#app_build_info' // Replace with your Slack channel
     }
 
     stages {
@@ -61,7 +63,27 @@ pipeline {
 
     post {
         always {
-            echo 'This will always run'
+            script {
+                def slackMessage = """
+                *Build Status:* ${currentBuild.currentResult}
+                *Image:* ${DOCKER_IMAGE}:${env.DOCKER_TAG}
+                *Branch:* ${env.BRANCH_NAME}
+                *Committer:* ${gitCommitterName()}
+                *Build URL:* ${env.BUILD_URL}
+                """
+                
+                if (currentBuild.result == 'SUCCESS') {
+                    slackSend(channel: SLACK_CHANNEL, color: 'good', message: slackMessage)
+                } else if (currentBuild.result == 'FAILURE') {
+                    slackSend(channel: SLACK_CHANNEL, color: 'danger', message: slackMessage)
+                }
+            }
         }
     }
+}
+
+// Helper function to get the committer name from the Git repository
+def gitCommitterName() {
+    def committerName = sh(script: 'git log -1 --pretty=format:"%cn"', returnStdout: true).trim()
+    return committerName
 }
