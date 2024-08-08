@@ -23,16 +23,16 @@ pipeline {
                     
                     if (env.BRANCH_NAME == 'dev') {
                         branchPrefix = 'dev'
-                    } else if (env.BRANCH_NAME == 'staging') {
+                    } else if (env.BRANCH_NAME == 'stage') {
                         branchPrefix = 'stage'
-                    } else if (env.BRANCH_NAME == 'production') {
+                    } else if (env.BRANCH_NAME == 'main') {
                         branchPrefix = 'prod'
                     } else {
                         branchPrefix = 'build'
                     }
 
                     // Construct the Docker tag using the branch prefix and build number
-                    def newVersion = "${branchPrefix}-${env.BUILD_NUMBER}"
+                    def newVersion = "${env.BUILD_NUMBER}-${branchPrefix}"
 
                     // Set the Docker tag as an environment variable
                     env.DOCKER_TAG = newVersion
