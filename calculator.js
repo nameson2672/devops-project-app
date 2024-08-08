@@ -9,7 +9,7 @@ const CalculationOperations = {
       return a * b;
     },
     divide: function(a, b) {
-      if (b === 0) throw new Error("Cannot divide by zero");
+      if (b === 0) throw new Error("Cannot divide by zero error");
       return a / b;
     }
   };
