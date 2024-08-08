@@ -63,7 +63,7 @@ pipeline {
         always {
             // Clean up the local Docker environment
             steps {
-				sh "docker rmi ${DOCKER_IMAGE}:${env.DOCKER_TAG} || true"
+				sh "true"
 			}
         }
     }
