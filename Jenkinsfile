@@ -61,10 +61,7 @@ pipeline {
 
     post {
         always {
-            // Clean up the local Docker environment
-            steps {
-				sh "true"
-			}
+            echo 'This will always run'
         }
     }
 }
