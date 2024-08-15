@@ -62,7 +62,9 @@ pipeline {
          stage('Trigger ManifestUpdate') {
             steps {
                 echo "triggering updatemanifestjob"
-                build job: 'Cd Pipline', parameters: [string(name: 'DOCKERTAG', value: env.DOCKER_TAG)]
+                build job: 'Cd Pipline', 
+                    parameters: [string(name: 'DOCKERTAG', value: env.DOCKER_TAG),
+                                string(name: 'ENVIRONMENT', value: env.ENVIRONMENT)]
             }
         }
     }
