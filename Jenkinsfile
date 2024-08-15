@@ -7,7 +7,6 @@ pipeline {
         DOCKER_CREDENTIALS_ID = 'dockerhub' // Use the ID from the credentials setup
          SLACK_CREDENTIALS_ID = 'slack_app_secret' // Use the ID from the credentials setup
         SLACK_CHANNEL = '#app_build_info' // Replace with your Slack channel
-        ENVIRONMENT= 'dev'
     }
 
     stages {
