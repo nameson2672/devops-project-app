@@ -23,16 +23,17 @@ pipeline {
                 script {
                     // Determine the branch prefix
                     def branchPrefix = ''
+                    def environmentName = ''
                     
                     if (env.BRANCH_NAME == 'dev') {
                         branchPrefix = 'dev'
-                        ENVIRONMENT= 'dev'
+                        environmentName= 'dev'
                     } else if (env.BRANCH_NAME == 'stage') {
                         branchPrefix = 'stage'
-                        ENVIRONMENT= 'staging'
+                        environmentName= 'staging'
                     } else if (env.BRANCH_NAME == 'main') {
                         branchPrefix = 'prod'
-                        ENVIRONMENT= 'prod'
+                        environmentName= 'prod'
                     } else {
                         branchPrefix = 'build'
                     }
@@ -42,6 +43,7 @@ pipeline {
 
                     // Set the Docker tag as an environment variable
                     env.DOCKER_TAG = newVersion
+                    env.ENVIRONMENT = environmentName
                 }
             }
         }
