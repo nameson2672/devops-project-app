@@ -22,13 +22,17 @@ pipeline {
                 script {
                     // Determine the branch prefix
                     def branchPrefix = ''
+                    def environmentName = ''
                     
                     if (env.BRANCH_NAME == 'dev') {
                         branchPrefix = 'dev'
+                        environmentName= 'dev'
                     } else if (env.BRANCH_NAME == 'stage') {
                         branchPrefix = 'stage'
+                        environmentName= 'staging'
                     } else if (env.BRANCH_NAME == 'main') {
                         branchPrefix = 'prod'
+                        environmentName= 'prod'
                     } else {
                         branchPrefix = 'build'
                     }
@@ -38,6 +42,7 @@ pipeline {
 
                     // Set the Docker tag as an environment variable
                     env.DOCKER_TAG = newVersion
+                    env.ENVIRONMENT = environmentName
                 }
             }
         }
@@ -59,6 +64,14 @@ pipeline {
 			}
             }
 		}
+         stage('Trigger ManifestUpdate') {
+            steps {
+                echo "triggering updatemanifestjob"
+                build job: 'Cd Pipline', 
+                    parameters: [string(name: 'DOCKERTAG', value: env.DOCKER_TAG),
+                                string(name: 'ENVIRONMENT', value: env.ENVIRONMENT)]
+            }
+        }
     }
 
     post {
